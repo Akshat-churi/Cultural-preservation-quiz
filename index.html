@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Cultural preservation quiz</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f4e3;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #ffcc5c;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            max-width: 700px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .hidden {
+            display: none;
+        }
+        .login-page, .info-page, .quiz-container {
+            text-align: center;
+        }
+        input[type="text"], input[type="password"] {
+            width: 80%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            color: #fff;
+            background-color: #ff6f61;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #e55a4f;
+        }
+        ul.options {
+            list-style: none;
+            padding: 0;
+        }
+        ul.options li {
+            margin: 10px 0;
+        }
+        .result {
+            display: none;
+            font-size: 1.5em;
+            color: #28a745;
+            text-align: center;
+        }
+        .progress {
+            margin: 20px 0;
+            font-size: 1em;
+        }
+        footer {
+            text-align: center;
+            padding: 10px;
+            background-color: #ffcc5c;
+            color: #fff;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Cultural Preservation Quiz!</h1>
+        <p>Test your knowledge about the cultural heritage of the world!</p>
+    </header>
+
+    <!-- Login Page -->
+    <div class="container login-page" id="loginPage">
+        <marquee><h2>Welcome To Cultural Preservation Quiz!</h2></marquee>
+        <p>Enter your username and password to start:</p>
+        <input type="text" id="username" placeholder="Your Username">
+        <input type="password" id="password" placeholder="Your Password">
+        <button onclick="validateAndStartQuiz()">Start Quiz</button>
+    </div>
+
+    <!-- User Info Page -->
+    <div class="container info-page hidden" id="infoPage">
+        <h2>Welcome, <span id="displayEmail"></span>!</h2>
+        <p>Get ready to test your knowledge!</p>
+        <button onclick="goToQuiz()"><a href="https://www.programiz.com/online-compiler/378u0AEhmOh1U">Proceed to Quiz</a></button>
+    </div>
+
+    <!-- Quiz Page -->
+    <div class="container quiz-container hidden" id="quizPage">
+        <h2 id="question"></h2>
+        <ul id="options" class="options"></ul>
+        <p class="progress" id="progress"></p>
+        <div class="result" id="result"></div>
+    </div>
+
+    <footer>
+        © 2024 Cultural Preservation Quiz | Keep the heritage alive!
+    </footer>
+
+    <script>
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        const emailInput = document.getElementById("username");
+        const passwordInput = document.getElementById("password");
+        const displayEmail = document.getElementById("displayEmail");
+        const loginPage = document.getElementById("loginPage");
+        const infoPage = document.getElementById("infoPage");
+        const quizPage = document.getElementById("quizPage");
+
+        const questions = [
+            {
+                question: "Which UNESCO World Heritage Site is located in India?",
+                options: ["(a) Statue of Liberty", "(b) Great Wall of China", "(c) Taj Mahal", "(d) Eiffel Tower"],
+                answer: "(c) Taj Mahal",
+                color: "#f4cccc"
+            },
+            {
+                question: "What is the traditional Japanese performance art that involves acting, singing, and dancing?",
+                options: ["(a) Kabuki", "(b) Flamenco", "(c) Ballet", "(d) Opera"],
+                answer: "(a) Kabuki",
+                color: "#c9daf8"
+            },
+            {
+                question: "Which ancient civilization is known for its Pyramids?",
+                options: ["(a) Roman", "(b) Egyptian", "(c) Mayan", "(d) Greek"],
+                answer: "(b) Egyptian",
+                color: "#d9ead3"
+            },
+            {
+                question: "The Olympic Games originated in which country?",
+                options: ["(a) India", "(b) Japan", "(c) America", "(d) Greece"],
+                answer: "(d) Greece",
+                color: "#ffe599"
+            }
+        ];
+
+        // Validate email and password, then start the quiz
+        function validateAndStartQuiz() {
+            const email = emailInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            if (!username || !password) {
+                alert("Please enter your username and password!");
+                return;
+            }
+
+            displayEmail.textContent = email;
+            loginPage.classList.add("hidden");
+            infoPage.classList.remove("hidden");
+        }
+
+        // Proceed to quiz
+        function goToQuiz() {
+            infoPage.classList.add("hidden");
+            quizPage.classList.remove("hidden");
+            loadQuestion();
+        }
+
+        // Load quiz questions
+        function loadQuestion() {
+            const questionElement = document.getElementById("question");
+            const optionsElement = document.getElementById("options");
+            const progressElement = document.getElementById("progress");
+            const resultElement = document.getElementById("result");
+
+            // Clear previous result and options
+            resultElement.style.display = "none";
+            optionsElement.innerHTML = "";
+
+            if (currentQuestionIndex < questions.length) {
+                const currentQuestion = questions[currentQuestionIndex];
+                questionElement.textContent = currentQuestion.question;
+
+                currentQuestion.options.forEach(option => {
+                    const button = document.createElement("button");
+                    button.textContent = option;
+                    button.onclick = () => checkAnswer(option);
+                    const li = document.createElement("li");
+                    li.appendChild(button);
+                    optionsElement.appendChild(li);
+                });
+
+                // Update progress and set background color
+                progressElement.textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+                document.body.style.backgroundColor = currentQuestion.color;
+            } else {
+                questionElement.textContent = "Quiz Completed!";
+                progressElement.textContent = "";
+                resultElement.style.display = "block";
+                resultElement.textContent = `Your final score is ${score}/${questions.length}`;
+            }
+        }
+
+        // Check the answer and load the next question
+        function checkAnswer(selectedOption) {
+            const currentQuestion = questions[currentQuestionIndex];
+            if (selectedOption === currentQuestion.answer) {
+                score++;
+                alert("Correct!");
+            } else {
+                alert(`Wrong! The correct answer is: ${currentQuestion.answer}`);
+            }
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+    </script>
+</body>
+</html>
